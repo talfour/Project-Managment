@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {{object}}
+  {% with users=object.user.all %}
+    {% for user in users %}
+      {{user.name}} {{user}}
+    {% endfor %}
+  {% endwith %}
+{% endblock %}
