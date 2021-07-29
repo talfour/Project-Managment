@@ -1,13 +1,18 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, ListView
 
 from .forms import ProjectCreateForm, TaskForm
-from .models import Project
+from .models import Project, Task
 
 # Create your views here.
 
 
-class ProjectListView(ListView):
+class ProjectListView(LoginRequiredMixin, ListView):
+    """Lists all available projects for logged user"""
+
     model = Project
     template_name = "project/list.html"
     paginate_by = 25
@@ -23,7 +28,9 @@ class ProjectListView(ListView):
         return queryset
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(LoginRequiredMixin, DetailView):
+    """Retrieve project details"""
+
     model = Project
     template_name = "project/detail.html"
 
@@ -32,7 +39,9 @@ class ProjectDetailView(DetailView):
         return context
 
 
-class ProjectCreateView(CreateView):
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    """Creates a new project"""
+
     model = Project
     form_class = ProjectCreateForm
     template_name = "project/create.html"
@@ -47,7 +56,9 @@ class ProjectCreateView(CreateView):
         return kwargs
 
 
+@login_required
 def task_create(request, slug):
+    """Create a new task related to existing project"""
     project = get_object_or_404(Project, slug=slug)
     if request.method == "POST":
         form = TaskForm(request.POST)
@@ -62,3 +73,14 @@ def task_create(request, slug):
     else:
         form = TaskForm()
     return render(request, "task/create.html", {"form": form})
+
+
+@login_required
+def task_details(request, slug, id):
+    project = get_object_or_404(Project, slug=slug)
+    if request.user not in project.crew.user.all():
+        return HttpResponseForbidden()
+    task = get_object_or_404(Task, id=id)
+    return render(
+        request, "task/details.html", {"task": task, "project": project}
+    )
