@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -41,9 +42,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
 
+    def get_absolute_url(self):
+        return reverse("project:list")
+
 
 class Crew(models.Model):
     """Crew for user object"""
 
     name = models.CharField(max_length=50)
-    user = models.ManyToManyField("User", related_name="Users")
+    user = models.ManyToManyField("User", related_name="crew")
+
+    def __str__(self):
+        return self.name
