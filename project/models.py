@@ -33,9 +33,11 @@ class Task(models.Model):
     )
     task_name = models.CharField(max_length=100)
     description = models.TextField()
-    status = models.CharField(max_length=11, choices=STATUS_CHOICES, default=1)
+    status = models.CharField(
+        max_length=11, choices=STATUS_CHOICES, default="not_started"
+    )
     priority = models.CharField(
-        max_length=15, choices=PRIORITY_CHOICES, default=-1
+        max_length=15, choices=PRIORITY_CHOICES, default="low"
     )
     assigned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     due_date = models.DateField(blank=True)
