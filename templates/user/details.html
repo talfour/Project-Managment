@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for project in user_projects %}
+  <div class="row">
+    Project: {{project}}
+    {% with p=project.tasks.all %}
+    Tasks:
+      {% for task_name in p %}
+        {{task_name}}
+      {% endfor %}
+    {% endwith %}
+  </div>
+  {% endfor %}
+
+{% endblock %}

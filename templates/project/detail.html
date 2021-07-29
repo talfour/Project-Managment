@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  {% if request.user %}
   {{object}}
   {% for task in object.tasks.all %}
     {{task}}
   {% endfor %}
+  {% endif %}
 {% endblock %}
