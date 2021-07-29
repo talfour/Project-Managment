@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from user.models import Crew, User
 
@@ -14,3 +15,6 @@ class CrewForm(forms.ModelForm):
     class Meta:
         model = Crew
         fields = ("name",)
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(label='Email / Username')
