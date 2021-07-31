@@ -4,8 +4,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView
 from django.views.generic.list import ListView
 from project.models import Project
-from django.contrib.auth import login, logout
-from user.authentication import EmailBackend
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from user.forms import CrewForm, LoginForm, UserForm

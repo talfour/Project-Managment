@@ -1,0 +1,39 @@
+.tasks{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'not-started in-progress on-hold completed';
+    gap: 10px;
+    margin-top: 2em;
+}
+
+.task{
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.tasks__not-started, .tasks__in-progress, .tasks__on-hold, .tasks__complete {
+    background: #f8f9fa;
+}
+
+.card {
+    margin-bottom: 2rem;
+}
+
+.task--low{
+    background-color: rgba(163,190,140, .7);
+}
+
+.task--medium{
+    background-color: rgba(235,203,139, .7);
+}
+
+.task--high{
+    background-color: rgba(191,97,106, .7);
+}
+
+.card-task{
+    text-decoration: none;
+    color: black;
+}

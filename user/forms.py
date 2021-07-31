@@ -1,6 +1,5 @@
 from django import forms
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from user.models import Crew, User
 
@@ -16,5 +15,6 @@ class CrewForm(forms.ModelForm):
         model = Crew
         fields = ("name",)
 
+
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(label='Email / Username')
+    username = forms.CharField(label="Email / Username")
