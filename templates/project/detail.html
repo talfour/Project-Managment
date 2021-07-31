@@ -19,6 +19,7 @@
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
         <p class="card-text">{{task.description}}</p>
+        {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
       </div>
 		</div>
   
@@ -33,6 +34,7 @@
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
         <p class="card-text">{{task.description}}</p>
+        {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
       </div>
 		</div>
 		{% endfor %}
@@ -46,6 +48,7 @@
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
         <p class="card-text">{{task.description}}</p>
+        {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
       </div>
 		</div>
 		{% endfor %}
@@ -59,6 +62,7 @@
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
         <p class="card-text">{{task.description}}</p>
+        {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
       </div>
 		</div>
 		{% endfor %}

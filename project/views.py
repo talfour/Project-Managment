@@ -106,6 +106,7 @@ def task_details(request, slug, id):
     )
 
 
+@login_required
 def task_status_change(request):
     try:
         new_status = json.loads(request.body.decode("UTF-8"))["new_status"]
@@ -126,4 +127,27 @@ def task_status_change(request):
         task.save()
         return JsonResponse(
             {"message": "Task status changed", "task": task.status}, status=200
+        )
+
+
+@login_required
+def task_assign_user(request):
+    try:
+        task_id = json.loads(request.body.decode("UTF-8"))["task_id"]
+    except ValueError:
+        return JsonResponse(
+            {"message": "There was an error while reading task_id"}, status=400
+        )
+    except KeyError:
+        return JsonResponse(
+            {"message": "There was an error while reading task_id"}, status=400
+        )
+    project = Project.objects.get(tasks__in=task_id)
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == "POST":
+        if request.user not in project.crew.user.all():
+            return HttpResponseForbidden()
+        task.assigned_by.add(request.user)
+        return JsonResponse(
+            {"message": "You were assigned to this task"}, status=200
         )

@@ -12,6 +12,11 @@ urlpatterns = [
         name="task_change",
     ),
     path(
+        "project/task-assign-user/",
+        views.task_assign_user,
+        name="task_assign",
+    ),
+    path(
         "project/create/",
         views.ProjectCreateView.as_view(),
         name="project_create",
