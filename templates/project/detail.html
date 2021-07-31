@@ -1,11 +1,71 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-  {% if request.user %}
-  {{object}}
-  {% for task in object.tasks.all %}
-    {{task}}
-  {% endfor %}
-  {% endif %}
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="p-5 text-center bg-light">
+	<h1 class="mb-3">{{object.name|title}}</h1>
+	<a
+		class="btn btn-primary"
+		href="{% url 'project:task_create' object.slug %}"
+		role="button"
+		>Add task</a
+	>
+</div>
+<div class="tasks">
+	<div class="tasks__not-started" data-status="not_started" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h2 class="text-center">Not started</h2>
+		{% for task in not_started %}
+    
+		<div data-id="{{task.id}}" draggable="true" ondragstart="drag(event)" class="card {% if task.priority == 'high' %}task--high{%elif  task.priority == 'medium' %}task--medium{%else%}task--low{%endif%}">
+      <div class="card-body">
+        <h5 class="card-title"><a class="card-task" href="{% url 'project:task_details' project.slug task.id %}">{{task.task_name|title}}</a></h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
+        <p class="card-text">{{task.description}}</p>
+      </div>
+		</div>
+  
+		{% endfor %}
+	</div>
+	<div class="tasks__in-progress" data-status="in_progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h2 class="text-center">In progress</h2>
+		{% for task in in_progress %}
+		<div data-id="{{task.id}}" draggable="true" ondragstart="drag(event)" class="card {% if task.priority == 'high' %}task--high{%elif  task.priority == 'medium' %}task--medium{%else%}task--low{%endif%}">
+      <div class="card-body">
+        <h5 class="card-title">{{task.task_name|title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
+        <p class="card-text">{{task.description}}</p>
+      </div>
+		</div>
+		{% endfor %}
+	</div>
+	<div class="tasks__on-hold" data-status="on_hold" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h2 class="text-center">On hold</h2>
+		{% for task in on_hold %}
+		<div data-id="{{task.id}}" draggable="true" ondragstart="drag(event)" class="card {% if task.priority == 'high' %}task--high{%elif  task.priority == 'medium' %}task--medium{%else%}task--low{%endif%}">
+      <div class="card-body">
+        <h5 class="card-title">{{task.task_name|title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
+        <p class="card-text">{{task.description}}</p>
+      </div>
+		</div>
+		{% endfor %}
+	</div>
+	<div class="tasks__complete" data-status="complete" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h2 class="text-center">Complete</h2>
+		{% for task in complete %}
+		<div data-id="{{task.id}}" draggable="true" ondragstart="drag(event)" class="card {% if task.priority == 'high' %}task--high{%elif  task.priority == 'medium' %}task--medium{%else%}task--low{%endif%}">
+      <div class="card-body">
+        <h5 class="card-title">{{task.task_name|title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">{{task.priority}}</h6>
+        <p class="card-text">{{task.description}}</p>
+      </div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'javascript/cookies.js' %}"></script>
+<script src="{% static 'javascript/index.js' %}"></script>
 {% endblock %}

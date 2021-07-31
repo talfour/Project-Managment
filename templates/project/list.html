@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="p-5 text-center bg-light">
+  <h1 class="mb-3">Your projects</h1>
+  
   {% for obj in object_list %}
-    <a href="{% url 'project:details' obj.slug %}">{{obj}}</a>
+  <h4 class="mb-3"><a href="{% url 'project:details' obj.slug %}">{{obj|title}}</a></h4>
   {% endfor %}
+</div>
+
 {% endblock %}

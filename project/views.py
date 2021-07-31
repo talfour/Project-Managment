@@ -1,6 +1,9 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
+from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, ListView
 
@@ -36,6 +39,23 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
+        tasks = Task.objects.filter(project=self.object)
+        tasks_on_hold = list(
+            filter(lambda task: task.status == "on_hold", tasks)
+        )
+        tasks_not_started = list(
+            filter(lambda task: task.status == "not_started", tasks)
+        )
+        tasks_in_progress = list(
+            filter(lambda task: task.status == "in_progress", tasks)
+        )
+        tasks_complete = list(
+            filter(lambda task: task.status == "complete", tasks)
+        )
+        context["on_hold"] = tasks_on_hold
+        context["not_started"] = tasks_not_started
+        context["in_progress"] = tasks_in_progress
+        context["complete"] = tasks_complete
         return context
 
 
@@ -84,3 +104,26 @@ def task_details(request, slug, id):
     return render(
         request, "task/details.html", {"task": task, "project": project}
     )
+
+
+def task_status_change(request):
+    try:
+        new_status = json.loads(request.body.decode("UTF-8"))["new_status"]
+    except KeyError:
+        return JsonResponse({"message": "There was an error with new status"})
+    if new_status not in ("complete", "in_progress", "not_started", "on_hold"):
+        return JsonResponse(
+            {"message": "There was an error with new status"}, status=400
+        )
+    print(new_status)
+    task_id = json.loads(request.body.decode("UTF-8"))["task_id"]
+    project = Project.objects.get(tasks__in=task_id)
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == "POST":
+        if request.user not in project.crew.user.all():
+            return HttpResponseForbidden()
+        task.status = new_status
+        task.save()
+        return JsonResponse(
+            {"message": "Task status changed", "task": task.status}, status=200
+        )

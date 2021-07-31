@@ -7,6 +7,11 @@ app_name = "project"
 urlpatterns = [
     path("", views.ProjectListView.as_view(), name="projects"),
     path(
+        "project/task-status-change/",
+        views.task_status_change,
+        name="task_change",
+    ),
+    path(
         "project/create/",
         views.ProjectCreateView.as_view(),
         name="project_create",
