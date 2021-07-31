@@ -4,27 +4,17 @@ from django.urls import reverse
 from django.utils.text import slugify
 from user.models import Crew
 
-STATUS_CHOICES = (
+STATUS_CHOICES = [
     ("complete", "Complete"),
     ("in_progress", "In progress"),
     ("not_started", "Not started"),
     ("on_hold", "On hold"),
-)
+]
 PRIORITY_CHOICES = (
     ("low", "Low"),
     ("medium", "Medium"),
     ("high", "High"),
 )
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=255)
-    task = models.ForeignKey("Task", on_delete=models.CASCADE)
-
-
-class Section(models.Model):
-    name = models.CharField(max_length=255)
-    task = models.ForeignKey("Task", on_delete=models.CASCADE)
 
 
 class Task(models.Model):
@@ -41,13 +31,15 @@ class Task(models.Model):
     )
     assigned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     due_date = models.DateField(blank=True)
-    time_spent = models.DurationField(null=True)
 
     def get_absolute_url(self):
         return reverse("task:details")
 
     def __str__(self):
         return self.task_name
+
+    class Meta:
+        ordering = ('priority', '-due_date')
 
 
 class Project(models.Model):
