@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from user.models import Crew
 
+from .utils import get_random_code
+
 STATUS_CHOICES = [
     ("complete", "Complete"),
     ("in_progress", "In progress"),
@@ -70,6 +72,19 @@ class Project(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
-        value = self.name
-        self.slug = slugify(value, allow_unicode=True)
+        ex = False
+        to_slug = self.slug
+        if self.slug:
+            return
+        if self.name:
+            to_slug = slugify(str(self.name))
+            if to_slug == "":
+                to_slug = str(self.name)
+            ex = Project.objects.filter(slug=to_slug).exists()
+            while ex:
+                to_slug = slugify(to_slug + " " + str(get_random_code()))
+                ex = Project.objects.filter(slug=to_slug).exists()
+        else:
+            to_slug = str(self.name)
+        self.slug = to_slug
         super().save(*args, **kwargs)
