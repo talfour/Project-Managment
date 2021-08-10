@@ -74,17 +74,16 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         ex = False
         to_slug = self.slug
-        if self.slug:
-            return
-        if self.name:
-            to_slug = slugify(str(self.name))
-            if to_slug == "":
-                to_slug = str(self.name)
-            ex = Project.objects.filter(slug=to_slug).exists()
-            while ex:
-                to_slug = slugify(to_slug + " " + str(get_random_code()))
+        if not self.slug:
+            if self.name:
+                to_slug = slugify(str(self.name))
+                if to_slug == "":
+                    to_slug = str(self.name)
                 ex = Project.objects.filter(slug=to_slug).exists()
-        else:
-            to_slug = str(self.name)
-        self.slug = to_slug
+                while ex:
+                    to_slug = slugify(to_slug + " " + str(get_random_code()))
+                    ex = Project.objects.filter(slug=to_slug).exists()
+            else:
+                to_slug = str(self.name)
+            self.slug = to_slug
         super().save(*args, **kwargs)
