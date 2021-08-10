@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls.base import reverse
 from django.views.generic import CreateView, DetailView, ListView
 
 from .forms import ProjectCreateForm, TaskForm
@@ -75,13 +76,16 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         kwargs["user"] = self.request.user
         return kwargs
 
+    def get_success_url(self):
+        return reverse("project:details", kwargs={"slug": self.object.slug})
+
 
 @login_required
 def task_create(request, slug):
     """Create a new task related to existing project"""
     project = get_object_or_404(Project, slug=slug)
     if request.method == "POST":
-        form = TaskForm(request.POST)
+        form = TaskForm(request.POST, slug=slug)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.project = project
@@ -91,7 +95,7 @@ def task_create(request, slug):
                 slug=project.slug,
             )
     else:
-        form = TaskForm()
+        form = TaskForm(slug=slug)
     return render(request, "task/create.html", {"form": form})
 
 
@@ -116,7 +120,6 @@ def task_status_change(request):
         return JsonResponse(
             {"message": "There was an error with new status"}, status=400
         )
-    print(new_status)
     task_id = json.loads(request.body.decode("UTF-8"))["task_id"]
     project = Project.objects.get(tasks__in=task_id)
     task = get_object_or_404(Task, id=task_id)
@@ -147,7 +150,42 @@ def task_assign_user(request):
     if request.method == "POST":
         if request.user not in project.crew.user.all():
             return HttpResponseForbidden()
+        if task.status == "complete":
+            return HttpResponseForbidden(
+                "You cannot assign yourself to task which is completed"
+            )
         task.assigned_by.add(request.user)
         return JsonResponse(
             {"message": "You were assigned to this task"}, status=200
         )
+
+
+@login_required
+def home_page(request):
+    user = request.user
+    user_tasks = Task.objects.filter(assigned_by=request.user)
+    active_tasks = user_tasks.exclude(status="complete")
+    total_tasks_completed = user_tasks.filter(status="complete")
+    projects = Project.objects.filter(crew__in=user.crew.all())
+
+    return render(
+        request,
+        "home.html",
+        {
+            "user_tasks": user_tasks,
+            "active_tasks": active_tasks,
+            "tasks_completed": total_tasks_completed,
+            "projects": projects,
+        },
+    )
+
+
+@login_required
+def delete_task(request, id):
+    task = get_object_or_404(Task, id=id)
+    if request.user != task.project.owner:
+        return HttpResponseForbidden(
+            "You must be project owner to delete task"
+        )
+    task.delete()
+    return redirect("project:details", slug=task.project.slug)

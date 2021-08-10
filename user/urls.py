@@ -7,7 +7,6 @@ app_name = "user"
 
 urlpatterns = [
     path("create/", views.CreateUserView.as_view(), name="user-create"),
-    path("details/", views.user_details, name="user-details"),
     path(
         "crew/create/",
         views.CreateCrewView.as_view(),
@@ -21,5 +20,4 @@ urlpatterns = [
     path("crew/list/", views.CrewListView.as_view(), name="crew-list"),
     path("login/", views.LoginView.as_view(), name="user-login"),
     path("logout/", views.logout_view, name="user-logout"),
-
 ]

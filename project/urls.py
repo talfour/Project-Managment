@@ -5,7 +5,9 @@ from project import views
 app_name = "project"
 
 urlpatterns = [
-    path("", views.ProjectListView.as_view(), name="projects"),
+    path("", views.home_page, name="home"),
+    path("projects/", views.ProjectListView.as_view(), name="projects"),
+    path("project/delete/<int:id>/", views.delete_task, name="delete"),
     path(
         "project/task-status-change/",
         views.task_status_change,
