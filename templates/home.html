@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Your profile {{user}}</h1>
+  <div>
+    Total task completed: {{tasks_completed.count}}
+  </div>
+  <div>Completed tasks
+    {% for task in tasks_completed %}
+      {{task}}
+    {% endfor %}
+  </div>
+  <div>
+    Active tasks
+    {% for task in active_tasks %}
+      {{task}}
+    {% endfor %}
+  </div>
+  
+  <div>Projects
+    {% for project in projects %}
+      {{project}}
+    {% endfor %}
+  </div>
+  
+{% endblock %}

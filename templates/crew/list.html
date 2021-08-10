@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-  Your crew:
   {% for crew in object_list %}
-    <a href="{% url 'user:crew-details' crew.id %}">{{crew}}</a>
+  <div class="p-5 text-center bg-light">
+    <h1 class="mb-3"><a href="{% url 'user:crew-details' crew.id %}">{{crew}}</a></h1>
+  </div>
   {% endfor %}
+
+
 {% endblock %}

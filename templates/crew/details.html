@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {{object}}
-  {% with users=object.user.all %}
+
+  <div class="p-5 text-center bg-light">
+    <h1 class="mb-3">{{object}}</h1>
+    {{object.user.all.task_set.all}}
+    {% with users=object.user.all %}
+    <h2 class="mb-3">Users in this group:</h2>
     {% for user in users %}
-      {{user.name}} {{user}}
+      <h5 class="mb-3">{{user.username}} {{user}} 
+        Completed tasks: 
+        {% for task in user.user_tasks.all %}
+          <!-- {{task}} - lista wszystkich tasków --> 
+          {% if task.status == "complete"%}
+            {{counter|add:"1"}}
+          {%endif %}
+        {% endfor %}</h3>
     {% endfor %}
   {% endwith %}
+
+  <h1 class="mb-3">Available projects</h1>
+  {% for project in object.projects.all %}
+    <h5 class="mb-3"><a href="{{project.get_absolute_url}}">{{project|title}}</a> </h3>
+      {{project.tasks.all}} 
+      <!-- Lista wszystkich tasków danego projektu -->
+  {% endfor %}
+  </div>
 {% endblock %}

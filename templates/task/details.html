@@ -1,8 +1,18 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 {% with task=task %}
   {{task}}
   {{task.status}}
+  {% if task.project.owner == request.user %}
+  <a href="{% url 'project:delete' task.id %}">Delete</a>
+  {% endif %}
+  {% if not request.user in task.assigned_by.all %}
+    <a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>
+  {%endif%}
 {% endwith %}
+{% block scripts %}
+<script src="{% static 'javascript/cookies.js' %}"></script>
+<script src="{% static 'javascript/index.js' %}"></script>
+{% endblock %}
 {% endblock %}

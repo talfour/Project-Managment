@@ -13,7 +13,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'project:projects' %}">Home</a>
+      <a class="navbar-brand" href="{% url 'project:home' %}">Home</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -23,17 +23,13 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'user:crew-list' %}">Crew</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:user-details' %}">{{request.user}}</a>
-          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Tasks
+              Projects
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="#">Create new task</a></li>
-              <li><a class="dropdown-item" href="#">Current tasks</a></li>
-              <li><a class="dropdown-item" href="#">Finished tasks</a></li>
+              <li><a class="dropdown-item" href="{% url 'project:project_create' %}">Create new project</a></li>
+              <li><a class="dropdown-item" href="{% url 'project:projects' %}">Your projects</a></li>
             </ul>
           </li>
         </ul>

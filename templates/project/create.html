@@ -4,7 +4,7 @@
 <form action="" method="post">
   {% csrf_token %}
   {{form|crispy}}
-  <input type="submit" value="Create project">
+  <input class="btn btn-primary" type="submit" value="Create project">
 </form>
 
 {% endblock %}
