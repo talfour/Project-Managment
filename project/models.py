@@ -11,9 +11,9 @@ STATUS_CHOICES = [
     ("on_hold", "On hold"),
 ]
 PRIORITY_CHOICES = (
-    ("low", "Low"),
-    ("medium", "Medium"),
-    ("high", "High"),
+    ("1", "Low"),
+    ("2", "Medium"),
+    ("3", "High"),
 )
 
 
@@ -27,19 +27,21 @@ class Task(models.Model):
         max_length=11, choices=STATUS_CHOICES, default="not_started"
     )
     priority = models.CharField(
-        max_length=15, choices=PRIORITY_CHOICES, default="low"
+        max_length=15, choices=PRIORITY_CHOICES, default="1"
     )
-    assigned_by = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-    due_date = models.DateField(blank=True)
+    assigned_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name="user_tasks"
+    )
+    due_date = models.DateField()
+
+    class Meta:
+        ordering = ("-priority", "-due_date")
 
     def get_absolute_url(self):
         return reverse("task:details")
 
     def __str__(self):
         return self.task_name
-
-    class Meta:
-        ordering = ('priority', '-due_date')
 
 
 class Project(models.Model):
@@ -51,7 +53,9 @@ class Project(models.Model):
         on_delete=models.CASCADE,
         related_name="projects",
     )
-    crew = models.ForeignKey(Crew, on_delete=models.CASCADE)
+    crew = models.ForeignKey(
+        Crew, on_delete=models.CASCADE, related_name="projects"
+    )
     dead_line = models.DateField()
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
