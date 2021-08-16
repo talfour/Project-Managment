@@ -40,7 +40,10 @@ class Task(models.Model):
         ordering = ("-priority", "-due_date")
 
     def get_absolute_url(self):
-        return reverse("task:details")
+        return reverse(
+            "project:task_details",
+            kwargs={"slug": self.project.slug, "id": self.id},
+        )
 
     def __str__(self):
         return self.task_name
