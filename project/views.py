@@ -7,8 +7,9 @@ from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls.base import reverse
 from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic.edit import DeleteView, UpdateView
 
-from .forms import ProjectCreateForm, TaskForm
+from .forms import ProjectCreateForm, ProjectUpdateForm, TaskForm
 from .models import Project, Task
 
 # Create your views here.
@@ -80,6 +81,41 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return reverse("project:details", kwargs={"slug": self.object.slug})
 
 
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+    """Update existing project"""
+
+    model = Project
+    form_class = ProjectUpdateForm
+    template_name = "project/update.html"
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectUpdateView, self).get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, slug=kwargs["slug"])
+        self.object = self.get_object()
+
+        if request.user != project.owner:
+            return HttpResponseForbidden(
+                "You must be a project author in order to update the project."
+            )
+        form = self.form_class(
+            request.POST, instance=project, user=request.user
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("project:details", slug=project.slug)
+
+
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
+    """Delete existing project"""
+
+    model = Project
+    success_url = "/"
+
+
 @login_required
 def task_create(request, slug):
     """Create a new task related to existing project"""
@@ -115,17 +151,26 @@ def task_status_change(request):
     try:
         new_status = json.loads(request.body.decode("UTF-8"))["new_status"]
     except KeyError:
-        return JsonResponse({"message": "There was an error with new status"})
+        return JsonResponse({"message": "Couldn't change status. Try again"})
     if new_status not in ("complete", "in_progress", "not_started", "on_hold"):
         return JsonResponse(
-            {"message": "There was an error with new status"}, status=400
+            {"message": "Couldn't change status. Try again"}, status=400
         )
     task_id = json.loads(request.body.decode("UTF-8"))["task_id"]
-    project = Project.objects.get(tasks__in=task_id)
+
+    project = Project.objects.get(tasks=task_id)
     task = get_object_or_404(Task, id=task_id)
+
     if request.method == "POST":
         if request.user not in project.crew.user.all():
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(
+                "You must be in crew in order to do something."
+            )
+        if request.user not in task.assigned_by.all():
+            print(task.assigned_by.all())
+            return HttpResponseForbidden(
+                "You must be assigned to this task to change it status."
+            )
         task.status = new_status
         task.save()
         return JsonResponse(
@@ -145,7 +190,7 @@ def task_assign_user(request):
         return JsonResponse(
             {"message": "There was an error while reading task_id"}, status=400
         )
-    project = Project.objects.get(tasks__in=task_id)
+    project = Project.objects.get(tasks=task_id)
     task = get_object_or_404(Task, id=task_id)
     if request.method == "POST":
         if request.user not in project.crew.user.all():
@@ -165,7 +210,6 @@ def home_page(request):
     user = request.user
     user_tasks = Task.objects.filter(assigned_by=request.user)
     active_tasks = user_tasks.exclude(status="complete")
-    total_tasks_completed = user_tasks.filter(status="complete")
     projects = Project.objects.filter(crew__in=user.crew.all())
 
     return render(
@@ -174,7 +218,6 @@ def home_page(request):
         {
             "user_tasks": user_tasks,
             "active_tasks": active_tasks,
-            "tasks_completed": total_tasks_completed,
             "projects": projects,
         },
     )
@@ -189,3 +232,15 @@ def delete_task(request, id):
         )
     task.delete()
     return redirect("project:details", slug=task.project.slug)
+
+
+@login_required
+def task_update(request, slug, id):
+    task = get_object_or_404(Task, id=id)
+    if request.user not in task.project.crew.user.all():
+        return HttpResponseForbidden("You must be in project crew")
+    form = TaskForm(request.POST or None, instance=task, slug=slug)
+    if form.is_valid():
+        form.save()
+        return redirect("project:details", slug=task.project.slug)
+    return render(request, "task/update.html", {"form": form})

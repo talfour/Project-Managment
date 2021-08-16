@@ -67,3 +67,11 @@ class ProjectCreateForm(forms.ModelForm):
         user = kwargs.pop("user")
         super(ProjectCreateForm, self).__init__(*args, **kwargs)
         self.fields["crew"].queryset = user.crew.all()
+
+
+class ProjectUpdateForm(ProjectCreateForm):
+    name = forms.CharField(disabled=True)
+
+    class Meta:
+        model = Project
+        fields = ["name", "description", "crew", "dead_line"]
