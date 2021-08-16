@@ -87,6 +87,39 @@ class NewProjectTest(TestCase):
         )
         self.assertEqual(Project.objects.count(), 0)
 
+    def test_project_update(self):
+        self.client.post(
+            reverse("project:project_create"),
+            data={
+                "name": "testpro",
+                "description": "desc",
+                "crew": self.crew.id,
+                "dead_line": "2022-08-22",
+            },
+        )
+        response = self.client.post(
+            reverse("project:update", kwargs={"slug": "testpro"}),
+            data={"description": "another test"},
+        )
+        print(response)
+        self.assertContains(response, "another test")
+
+    def test_project_delete(self):
+        project = Project.objects.create(
+            name="test",
+            slug="test",
+            description="test_desc",
+            owner=self.user,
+            crew=self.crew,
+            dead_line="2021-12-20",
+        )
+
+        self.client.post(
+            reverse("project:delete_project", kwargs={"slug": project.slug})
+        )
+
+        self.assertEqual(0, Project.objects.count())
+
 
 class TaskViewTest(TestCase):
     def setUp(self):
@@ -101,7 +134,6 @@ class TaskViewTest(TestCase):
     def test_create_task(self):
         project = Project.objects.create(
             name="test",
-            slug="test",
             description="test_desc",
             owner=self.user,
             crew=self.crew,
@@ -171,3 +203,22 @@ class TaskViewTest(TestCase):
         self.assertContains(response, "Task2")
         self.assertNotContains(response, "Other_task")
         self.assertNotContains(response, "Other_task2")
+
+    def test_display_task_update(self):
+        project = Project.objects.create(
+            name="test",
+            description="test_desc",
+            owner=self.user,
+            crew=self.crew,
+            dead_line="2021-12-20",
+        )
+        task = create_default_task(project)
+
+        response = self.client.get(
+            reverse(
+                "project:task_update",
+                kwargs={"slug": project.slug, "id": task.id},
+            )
+        )
+        self.assertContains(response, task.task_name)
+        self.assertContains(response, "Update")

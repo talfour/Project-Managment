@@ -1,7 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from project.models import Task
-from project.test.helpers import create_default_project
+from project.models import Project, Task
+from project.test.helpers import (
+    create_default_crew,
+    create_default_project,
+    create_default_user,
+)
 
 
 class TaskModelTest(TestCase):
@@ -56,3 +60,23 @@ class ProjectModelTest(TestCase):
         self.assertEqual(
             project.get_absolute_url(), f"/project/{project.slug}/"
         )
+
+    def test_on_save_slug_is_generated_and_not_duplicated(self):
+        user = create_default_user()
+        crew = create_default_crew()
+        project = Project.objects.create(
+            name="test",
+            description="test_desc",
+            owner=user,
+            crew=crew,
+            dead_line="2021-12-20",
+        )
+        project2 = Project.objects.create(
+            name="test",
+            description="test_desc",
+            owner=user,
+            crew=crew,
+            dead_line="2021-12-20",
+        )
+
+        self.assertNotEqual(project.slug, project2.slug)

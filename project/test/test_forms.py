@@ -6,9 +6,8 @@ from project.forms import (
     TaskForm,
 )
 from project.models import Project, Task
-from user.models import Crew, User
-
 from project.test.helpers import create_default_project, create_default_user
+from user.models import Crew, User
 
 
 class ProjectFormTest(TestCase):
@@ -38,7 +37,6 @@ class TaskFormTest(TestCase):
         crew.user.add(user)
         project = Project.objects.create(
             name="test",
-            slug="test",
             description="test_desc",
             owner=user,
             crew=crew,
@@ -72,7 +70,6 @@ class TaskFormTest(TestCase):
         crew.user.add(user)
         project = Project.objects.create(
             name="test",
-            slug="test",
             description="test_desc",
             owner=user,
             crew=crew,
