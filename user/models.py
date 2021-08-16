@@ -45,6 +45,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_absolute_url(self):
         return reverse("project:list")
 
+    def count_tasks_completed(self):
+        return self.user_tasks.all().filter(status="complete").count()
+
 
 class Crew(models.Model):
     """Crew for user object"""
@@ -54,3 +57,6 @@ class Crew(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("user:crew-details", kwargs={"pk": self.pk})
