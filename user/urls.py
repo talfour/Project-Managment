@@ -1,5 +1,4 @@
 from django.urls import path
-from django.urls.conf import include
 
 from user import views
 
@@ -16,6 +15,11 @@ urlpatterns = [
         "crew/details/<int:pk>/",
         views.CrewDetailView.as_view(),
         name="crew-details",
+    ),
+    path(
+        "crew/details/<int:pk>/add-user/",
+        views.add_user_to_crew,
+        name="add-user",
     ),
     path("crew/list/", views.CrewListView.as_view(), name="crew-list"),
     path("login/", views.LoginView.as_view(), name="user-login"),
