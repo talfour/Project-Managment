@@ -18,3 +18,7 @@ class CrewForm(forms.ModelForm):
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label="Email / Username")
+
+
+class AddUserToCrewForm(forms.Form):
+    user_email = forms.CharField(label="User email", max_length=100)
