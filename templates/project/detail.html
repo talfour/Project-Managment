@@ -16,14 +16,16 @@
 	<div class="tasks__not-started" data-status="not_started" ondrop="drop(event)" ondragover="allowDrop(event)">
     <h2 class="text-center">Not started</h2>
 		{% for task in not_started %}
-    
 		<div data-id="{{task.id}}" draggable="true" ondragstart="drag(event)" class="card {% if task.get_priority_display == 'High' %}task--high{%elif  task.get_priority_display == 'Medium' %}task--medium{%else%}task--low{%endif%}">
       <div class="card-body">
         <h5 class="card-title"><a class="card-task" href="{% url 'project:task_details' project.slug task.id %}">{{task.task_name|title}}</a></h5>
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.get_priority_display}}</h6>
-        <p class="card-text">{{task.description}}</p>
+        <p class="card-text">{{task.description|truncatechars:20}}</p>
         {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
+        {% if not task.assigned_by.all %}
+            <h6 class="mt-2 text-muted fs-6">Task is not assigned by anyone</h6>
+        {% endif %}
       </div>
 		</div>
   
@@ -37,8 +39,11 @@
         <h5 class="card-title"><a class="card-task" href="{% url 'project:task_details' project.slug task.id %}">{{task.task_name|title}}</a></h5>
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.get_priority_display}}</h6>
-        <p class="card-text">{{task.description}}</p>
+        <p class="card-text">{{task.description|truncatechars:20}}</p>
         {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
+        {% if not task.assigned_by.all %}
+            <h6 class="mt-2 text-muted fs-6">Task is not assigned by anyone</h6>
+        {% endif %}
       </div>
 		</div>
 		{% endfor %}
@@ -51,8 +56,11 @@
         <h5 class="card-title"><a class="card-task" href="{% url 'project:task_details' project.slug task.id %}">{{task.task_name|title}}</a></h5>
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.get_priority_display}}</h6>
-        <p class="card-text">{{task.description}}</p>
+        <p class="card-text">{{task.description|truncatechars:20}}</p>
         {% if not request.user in task.assigned_by.all %}<a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>{%endif%}
+        {% if not task.assigned_by.all %}
+            <h6 class="mt-2 text-muted fs-6">Task is not assigned by anyone</h6>
+        {% endif %}
       </div>
 		</div>
 		{% endfor %}
@@ -65,7 +73,10 @@
         <h5 class="card-title"><a class="card-task" href="{% url 'project:task_details' project.slug task.id %}">{{task.task_name|title}}</a></h5>
         <h6 class="card-subtitle mb-2 text-muted">{{task.due_date}}</h6>
         <h6 class="card-subtitle mb-2 text-muted">{{task.get_priority_display}}</h6>
-        <p class="card-text">{{task.description}}</p>
+        <p class="card-text">{{task.description|truncatechars:20}}</p>
+        {% if not task.assigned_by.all %}
+            <h6 class="mt-2 text-muted fs-6">Task is not assigned by anyone</h6>
+        {% endif %}
       </div>
 		</div>
 		{% endfor %}

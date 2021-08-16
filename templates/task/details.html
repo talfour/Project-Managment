@@ -2,17 +2,31 @@
 {% load static %}
 {% block content %}
 {% with task=task %}
-  {{task}}
-  {{task.status}}
-  {% if task.project.owner == request.user %}
-  <a href="{% url 'project:delete' task.id %}">Delete</a>
+<div class="p-5 text-center bg-light">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+    {% if task.project.owner == request.user %}
+    <a class="btn btn-danger ml-auto" href="{% url 'project:delete' task.id %}">Delete</a>
   {% endif %}
   {% if not request.user in task.assigned_by.all %}
-    <a href="#" class="btn btn-primary" onclick="assign_me(event)">Assign me</a>
+    <a href="#" class="btn btn-primary" data-id="{{task.id}}" onclick="assign_me(event)">Assign me</a>
   {%endif%}
+  {% if request.user in task.assigned_by.all %}
+    <a class="btn btn-success" href="{% url 'project:task_update' task.project.slug task.id %}">Update task</a>
+  {% endif %}
+  </div>
+	<h1 class="mb-5">{{task}}</h1>
+  <h3 class="mb-3">Dead line: {{task.due_date}}</h3>
+  <h5 class="mb-2">Priority: {{task.get_priority_display}}</h3>
+  <h5 class="mb-2">Status: {{task.get_status_display}}</h3>
+  <h6 class="mb-1">Assigned by:</h3>
+    {% for user in task.assigned_by.all %}
+    <h6 class="mb-3">{{user}}</h3>
+    {% endfor %}
+  <h5 class="">{{task.description}}</h3>
+
 {% endwith %}
 {% block scripts %}
 <script src="{% static 'javascript/cookies.js' %}"></script>
-<script src="{% static 'javascript/index.js' %}"></script>
+
 {% endblock %}
 {% endblock %}

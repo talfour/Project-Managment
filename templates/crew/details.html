@@ -1,29 +1,40 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 
 {% block content %}
-
   <div class="p-5 text-center bg-light">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+      <a class="btn btn-success ml-auto" href="{% url 'user:add-user' object.pk%}">Add user</a>
+    </div>
     <h1 class="mb-3">{{object}}</h1>
-    {{object.user.all.task_set.all}}
     {% with users=object.user.all %}
+    {{total.test}}
     <h2 class="mb-3">Users in this group:</h2>
     {% for user in users %}
-      <h5 class="mb-3">{{user.username}} {{user}} 
-        Completed tasks: 
-        {% for task in user.user_tasks.all %}
-          <!-- {{task}} - lista wszystkich tasków --> 
-          {% if task.status == "complete"%}
-            {{counter|add:"1"}}
-          {%endif %}
-        {% endfor %}</h3>
+      <h5 class="mb-3">
+        {{user}} 
+        
+        Completed tasks: {% get_tasks_done_in_specific_crew user.email object.projects.all %}
+        Assigned tasks: {% get_assigned_tasks_in_specific_crew user.email object.projects.all %}
     {% endfor %}
   {% endwith %}
-
-  <h1 class="mb-3">Available projects</h1>
+</div>
+  <h1 class="mb-5 mt-5 text-center">Available projects</h1>
+  <div class="row">
   {% for project in object.projects.all %}
-    <h5 class="mb-3"><a href="{{project.get_absolute_url}}">{{project|title}}</a> </h3>
-      {{project.tasks.all}} 
-      <!-- Lista wszystkich tasków danego projektu -->
-  {% endfor %}
+  <div class="card col-6">
+    <div class="card-body">
+      <h5 class="card-title"><a href="{{project.get_absolute_url}}">{{project|title}}</a></h5>
+      <h6 class="card-subtitle mb-1">Tasks: {{project.tasks.all|length}}</h6>
+      <h6 class="card-subtitle">Tasks completed: 
+        {% for task in project.tasks.all %}
+          {% if task.status == "complete" %}
+            {{counter|add:"1"}}
+          {% endif %}
+        {% endfor %}
+      </h6>
+    </div>
   </div>
+  {% endfor %}
+</div>
 {% endblock %}
