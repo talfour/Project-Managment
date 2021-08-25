@@ -61,6 +61,7 @@ class Project(models.Model):
     crew = models.ForeignKey(
         Crew, on_delete=models.CASCADE, related_name="projects"
     )
+    active = models.BooleanField(default=True)
     dead_line = models.DateField()
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
