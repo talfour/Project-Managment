@@ -1,5 +1,6 @@
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
@@ -30,6 +31,8 @@ class ProjectListView(LoginRequiredMixin, ListView):
         user = self.request.user
         crew = user.crew.all()
         queryset = Project.objects.filter(crew__in=crew)
+        if self.request.GET.get("active"):
+            queryset = queryset.filter(active=True)
         return queryset
 
 
@@ -70,6 +73,9 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
+        messages.success(
+            self.request, "You have created a new project successfully."
+        )
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -106,6 +112,7 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
         )
         if form.is_valid():
             form.save()
+            messages.success(request, "You have updated project successfully.")
             return redirect("project:details", slug=project.slug)
 
 
@@ -126,6 +133,7 @@ def task_create(request, slug):
             obj = form.save(commit=False)
             obj.project = project
             obj.save()
+            messages.success(request, "New task has been created.")
             return redirect(
                 "project:details",
                 slug=project.slug,
@@ -133,6 +141,20 @@ def task_create(request, slug):
     else:
         form = TaskForm(slug=slug)
     return render(request, "task/create.html", {"form": form})
+
+
+@login_required
+def task_list(request):
+    tasks = Task.objects.filter(assigned_by=request.user).order_by(
+        "project__name", "-priority"
+    )
+    if request.GET.get("active"):
+        tasks = tasks.exclude(status="complete").order_by(
+            "project__name", "-priority"
+        )
+    if request.GET.get("completed"):
+        tasks = tasks.filter(status="complete").order_by("project__name")
+    return render(request, "task/list.html", {"tasks": tasks})
 
 
 @login_required
@@ -209,7 +231,7 @@ def task_assign_user(request):
 def home_page(request):
     user = request.user
     user_tasks = Task.objects.filter(assigned_by=request.user)
-    active_tasks = user_tasks.exclude(status="complete")
+    active_tasks = user_tasks.exclude(status="complete")[:10]
     projects = Project.objects.filter(crew__in=user.crew.all())
 
     return render(
@@ -231,6 +253,7 @@ def delete_task(request, id):
             "You must be project owner to delete task"
         )
     task.delete()
+    messages.warning(request, "Task has been deleted.")
     return redirect("project:details", slug=task.project.slug)
 
 
@@ -242,5 +265,6 @@ def task_update(request, slug, id):
     form = TaskForm(request.POST or None, instance=task, slug=slug)
     if form.is_valid():
         form.save()
+        messages.success(request, "Task has been updated.")
         return redirect("project:details", slug=task.project.slug)
     return render(request, "task/update.html", {"form": form})
