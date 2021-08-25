@@ -2,11 +2,25 @@
 
 {% block content %}
 <div class="p-5 text-center bg-light">
-  <h1 class="mb-3">Your projects</h1>
-  
-  {% for obj in object_list %}
-  <h4 class="mb-3"><a href="{% url 'project:details' obj.slug %}">{{obj|title}}</a></h4>
-  {% endfor %}
+  <h1 class="mb-3">Your active projects</h1>
+  {% with projects=object_list %}
+  <div class="project-list">
+    {% for obj in projects %}
+      {% if obj.active %}
+        <h4 class="mb-3 project"><a href="{% url 'project:details' obj.slug %}">{{obj|title}}</a></h4>
+      {% endif %}
+    {% endfor %}
+  </div>
+    <h1 class="mb-3 mt-5">Your finished projects</h1>
+    <div class="project-list">
+      {% for obj in projects %}
+      {% if obj.active == False %}
+        <h4 class="mb-3"><a href="{% url 'project:details' obj.slug %}">{{obj|title}}</a></h4>
+      {% endif %}
+    {% endfor %}
+    </div>
+    
+  {% endwith %}
 </div>
 
 {% endblock %}

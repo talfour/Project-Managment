@@ -5,12 +5,29 @@
   <h5 class="mb-1">Owner: {{object.owner}}</h3>
   <h5 class="mb-1">Crew: {{object.crew}}</h3>
   <h5 class="mb-3">Dead line: {{object.dead_line}}</h3>
-	<a
-		class="btn btn-primary"
-		href="{% url 'project:task_create' object.slug %}"
+  
+
+  {% if object.active %}
+  <a
+  class="btn btn-primary"
+  href="{% url 'project:task_create' object.slug %}"
+  role="button"
+  >Add task</a
+>
+  <a
+		class="btn btn-danger"
+		href="{% url 'project:project_finish' object.slug %}"
 		role="button"
-		>Add task</a
+		>Close project</a
 	>
+  {% else %}
+  <a
+  class="btn btn-success"
+  href="{% url 'project:project_finish' object.slug %}"
+  role="button"
+  >Re-open project</a
+>
+  {% endif %}
 </div>
 <div class="tasks">
 	<div class="tasks__not-started" data-status="not_started" ondrop="drop(event)" ondragover="allowDrop(event)">

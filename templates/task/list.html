@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrapper-tasks">
+  {% for task in tasks %}
+    <a href="{% url 'project:task_details' task.project.slug task.id %}">
+    <div class="task-list {% if task.get_priority_display == 'High' %}task--high{%elif  task.get_priority_display == 'Medium' %}task--medium{%else%}task--low{%endif%}">
+      <div class="task__name">Task: {{task|title}}</div>
+      <div class="task__project">Project: {{task.project}}</div>
+      <div class="task__due-date">Due date: {{task.due_date}}</div>
+    </div>
+  </a>
+  {% empty %}
+  <h3 class="text-center mt-5">There is not tasks</h3>
+{% endfor %}
+</div>
+
+{% endblock %}

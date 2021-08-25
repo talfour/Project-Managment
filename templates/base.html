@@ -5,77 +5,122 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-  {% block css %}
-  {% endblock %}
-  <title>Project Managment</title>
+  <title>Project Managment - {%block title%}{%endblock%}</title>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'project:home' %}">Home</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        {% if user.is_authenticated %}
-        <ul class="navbar-nav">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Crew
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="{% url 'user:crew-list' %}">Your crews</a></li>
-              <li><a class="dropdown-item" href="{% url 'user:crew_create' %}">Create new crew</a></li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Projects
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="{% url 'project:project_create' %}">Create new project</a></li>
-              <li><a class="dropdown-item" href="{% url 'project:projects' %}">Your projects</a></li>
-            </ul>
-          </li>
-        </ul>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:user-logout' %}">Logout</a>
-          </li>
-        </ul>
-        {% else %}
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:user-create' %}">Register</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:user-login' %}">Login</a>
-          </li>
-        </ul>
-          {% endif %}
+  <div class="wrapper">
+    <!-- Sidebar  -->
+    {% if user.is_authenticated %}
+    <div class="sidebar close">
+      <div class="logo-details">
+        <i class="fas fa-bezier-curve"></i>
+        <span class="logo_name">Project Managment</span>
       </div>
+      <ul class="nav-links">
+        <li>
+          <div class="iocn-link">
+            <a href="{% url 'project:home' %}">
+              <i class="fas fa-home"></i>
+              <span class="link_name">Home</span>
+          </a>
+        </div>
+        </li>
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="fas fa-users"></i>
+              <span class="link_name">Crew</span>
+            </a>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <ul class="sub-menu">
+            <li class="link_name--sub-menu">Crew</li>
+            <li><a href="{% url 'user:crew-list' %}">Your crews</a></li>
+            <li><a href="{% url 'user:crew-create' %}">Create new crew</a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="fas fa-tasks"></i>
+              <span class="link_name">Tasks</span>
+            </a>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <ul class="sub-menu">
+            <li class="link_name--sub-menu">Tasks</li>
+            <li><a href="{% url 'project:task_list' %}?active=True">Active Tasks</a></li>
+            <li><a href="{% url 'project:task_list' %}?completed=True">Completed Tasks</a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="fas fa-book"></i>
+              <span class="link_name">Projects</span>
+            </a>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <ul class="sub-menu">
+            <li class="link_name--sub-menu">Projects</li>
+            <li><a href="{% url 'project:project_create' %}">Create new project</a></li>
+            <li><a href="{% url 'project:projects' %}">Your projects</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
-  </nav>
-  {% if messages %}
-  {% for message in messages %}
-  <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
-    {{message}}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    
-  </div>
-{% endfor %}
-  {% endif %}
-  <div class="container">
+    {% endif %}
+
+    <!-- Page Content  -->
+    <div id="content" {% if user.is_authenticated %}{%else%}style="left:0; width:100%;"{%endif %}>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                {% if user.is_authenticated %}
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                  <i class="fas fa-bars"></i>
+                    <span>Dashboard</span>
+                </button>
+                {% endif %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
+                  <ul class="navbar-nav ms-auto mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:user-logout' %}"><button type="button" class="btn btn-dark">Logout</button></a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'user:user-create' %}"><button type="button" class="btn btn-success">Register</button></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{% url 'user:user-login' %}"><button type="button" class="btn btn-success">Login</button></a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                </div>
+        </nav>
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
   {% block content %}
   {% endblock %}
+  </div>
+  </div>
   {% block scripts %}
   {% endblock %}
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.js" crossorigin="anonymous"></script>
+  
+  <script src="{% static 'javascript/styling.js' %}"></script>
 </body>
 </html>

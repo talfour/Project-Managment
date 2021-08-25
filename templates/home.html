@@ -1,50 +1,123 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% block title %}Home{% endblock %}
 {% block content %}
-  <h1>Your profile {{user}}</h1>
-  <div>
-    Total task completed: {{user.count_tasks_completed}}
+<h1 class="text-center">Your profile {{user}}</h1>
+<div class="container-grid">
+  <div class="cards-wrapper">
+    <div class="cards">
+      <a href="{% url 'project:task_list' %}?completed=true">
+      <div class="cards__card-header">
+        <div class="cards__card-header-title">
+          {{user.count_tasks_completed}}
+        </div>
+        <div class="cards__card-header-icon">
+          <i class="fas fa-clipboard-check"></i>
+        </div>
+      </div>
+      <div class="cards__card-info">Tasks completed</div>
+      </a>
+    </div>
+    <div class="cards">
+      <a href="{% url 'project:task_list' %}?active=true">
+      <div class="cards__card-header">
+        <div class="cards__card-header-title">{{active_tasks.count}}</div>
+        <div class="cards__card-header-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+      </div>
+      <div class="cards__card-info">Active tasks</div>
+    </a>
+    </div>
   </div>
-  <div>
-    Active tasks
-    {% for task in active_tasks %}
-      <a href="{{task.get_absolute_url}}">{{task}}</a>
-    {% endfor %}
+  <div class="cards-wrapper">
+    <div class="cards">
+      <a href="{% url 'project:projects' %}?active=true">
+      <div class="cards__card-header">
+        <div class="cards__card-header-title">{{projects.count}}</div>
+        <div class="cards__card-header-icon">
+          <i class="fas fa-book"></i>
+        </div>
+      </div>
+      <div class="cards__card-info">Active projects</div>
+      </a>
+    </div>
+    <div class="cards">
+      <a href="{% url 'user:crew-list' %}">
+      <div class="cards__card-header">
+        <div class="cards__card-header-title">{{user.crew.count}}</div>
+        <div class="cards__card-header-icon">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+      <div class="cards__card-info">Groups you are in</div>
+    </a>
+    </div>
   </div>
-  
-  <div>Projects
-    {% for project in projects %}
-      {{project}}
-    {% endfor %}
   </div>
-  <div class="calendar"></div>
-  
-  <script>
+	
+<div class="info">
+	<div class="active-tasks">
+		<h3 class="text-center mb-3">Recent tasks</h3>
+		<div class="active-tasks__container">
+			<span class="task__name" ><strong>Task name</strong></span>
+			<span class="task__status"><strong>Status</strong></span>
+			<span class="task__priority"><strong>Priority</strong></span>
+			<span class="task__dead-line"><strong>Dead line</strong></span>
+			{% for task in active_tasks %}
+			<span class="task__name">
+        <a class="task__link" href="{{task.get_absolute_url}}">{{task|title}}</a>
+      </span>
+			<span class="task__status">{{task.get_status_display}}</span>
+			<span class="task__priority">{{task.get_priority_display}}</span>
+			<span class="task__dead-line">{{task.due_date}}</span>
+			{% endfor %}
+		</div>
+	</div>
+  <div class="active-projects">
+		<h3 class="text-center mb-3">Recent projects</h3>
+		<div class="active-projects__container">
+			<span class="project__name"><strong>Project name</strong></span>
+			<span class="project__owner"><strong>Owner</strong></span>
+			<span class="project__crew"><strong>Crew</strong></span>
+			<span class="project__dead-line"><strong>Dead line</strong></span>
+			{% for project in projects %}
+			<span class="project__name">
+        <a class="project__link" href="{{project.get_absolute_url}}">{{project|title}}</a>
+      </span>
+			<span class="project__owner">{{project.owner}}</span>
+			<span class="project__crew">{{project.crew}}</span>
+			<span class="project__dead-line">{{project.dead_line}}</span>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+	<div class="calendar"></div>
+	<script>
 
-    document.addEventListener("DOMContentLoaded", function(){
-      let calendarElement = document.querySelector('.calendar');
-      let calendar = new FullCalendar.Calendar(calendarElement, {
+		  document.addEventListener("DOMContentLoaded", function(){
+		    let calendarElement = document.querySelector('.calendar');
+		    let calendar = new FullCalendar.Calendar(calendarElement, {
 
-        events: [
-        {% for task in active_tasks %}
-          {
-            title: '{{task.task_name}}',
-            start: '{{task.due_date|date:"Y-m-d"}}',
-            url: '{{task.get_absolute_url}}',
-            description: '{{task.project}}',
-            backgroundColor: '{% if task.priority == "3" %}rgba(191,97,106, .7){%elif task.priority == "2"%}rgba(235,203,139, .7){%else%}rgba(163,190,140, .7){%endif%}',
-            borderColor: '{% if task.priority == "3" %}rgb(191,97,106){%elif task.priority == "2"%}rgb(235,203,139){%else%}rgb(163,190,140){%endif%}',
-            textColor: 'black',
+		      events: [
+		      {% for task in active_tasks %}
+		        {
+		          title: '{{task.task_name}}',
+		          start: '{{task.due_date|date:"Y-m-d"}}',
+		          url: '{{task.get_absolute_url}}',
+		          description: '{{task.project}}',
+		          backgroundColor: '{% if task.priority == "3" %}rgba(191,97,106, .7){%elif task.priority == "2"%}rgba(235,203,139, .7){%else%}rgba(163,190,140, .7){%endif%}',
+		          borderColor: '{% if task.priority == "3" %}rgb(191,97,106){%elif task.priority == "2"%}rgb(235,203,139){%else%}rgb(163,190,140){%endif%}',
+		          textColor: 'black',
 
-          },
-        {% endfor %}
-      ],
-          initialView: 'dayGridMonth',
-          locale: 'en',
-      });
-      calendar.render();
-  });
-
-  </script>
-{% endblock %}
+		        },
+		      {% endfor %}
+		    ],
+		        initialView: 'dayGridMonth',
+		        locale: 'en',
+		    });
+		    calendar.render();
+		});
+	</script>
+	{% endblock %}
+</div>
