@@ -124,9 +124,27 @@ class ProjectDeleteView(LoginRequiredMixin, DeleteView):
 
 
 @login_required
+def project_finish(request, slug):
+    project = Project.objects.get(slug=slug)
+    if request.user != project.owner:
+        HttpResponseForbidden(
+            "You must be project owner in order to close this project."
+        )
+    if project.active:
+        project.active = False
+        project.save()
+    else:
+        project.active = True
+        project.save()
+    return redirect("project:projects")
+
+
+@login_required
 def task_create(request, slug):
     """Create a new task related to existing project"""
     project = get_object_or_404(Project, slug=slug)
+    if project.active is False:
+        return HttpResponseForbidden("This project is finished.")
     if request.method == "POST":
         form = TaskForm(request.POST, slug=slug)
         if form.is_valid():

@@ -44,6 +44,11 @@ urlpatterns = [
         name="task_create",
     ),
     path(
+        "project/<slug:slug>/close-project/",
+        views.project_finish,
+        name="project_finish",
+    ),
+    path(
         "project/<slug:slug>/task/<int:id>/",
         views.task_details,
         name="task_details",
