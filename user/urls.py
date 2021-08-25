@@ -9,7 +9,7 @@ urlpatterns = [
     path(
         "crew/create/",
         views.CreateCrewView.as_view(),
-        name="crew_create",
+        name="crew-create",
     ),
     path(
         "crew/details/<int:pk>/",
